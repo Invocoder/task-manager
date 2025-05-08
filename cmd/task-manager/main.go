@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/invocoder/task-manager/internal/config"
+	"github.com/invocoder/task-manager/internal/config/http/handlers/task"
 )
 
 func main() {
@@ -22,16 +23,15 @@ func main() {
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("GET /", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to Task Management api"))
-	})
+	router.HandleFunc("POST /api/tasks", task.New())
+
 	//setup server
 	server := http.Server{
 		Addr:    cfg.Addr,
 		Handler: router,
 	}
-    
-	slog.Info("server started %s",slog.String("address", cfg.Addr))
+
+	slog.Info("server started %s", slog.String("address", cfg.Addr))
 	fmt.Println("server started")
 
 	done := make(chan os.Signal, 1)
@@ -47,7 +47,6 @@ func main() {
 	slog.Info("shutting down the server")
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-
 
 	if err := server.Shutdown(ctx); err != nil {
 		slog.Error("failed to shutdown server", slog.String("error", err.Error()))
