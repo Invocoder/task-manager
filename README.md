@@ -22,3 +22,54 @@ This service is a simple **Task Manager API** designed to manage tasks with basi
 ```bash
 git clone https://github.com/invocoder/task-manager.git
 cd task-manager
+
+## 📘 API Documentation
+
+The Task Management API allows you to create, retrieve, update, and delete tasks.
+
+### 🔗 Swagger Documentation
+Access full interactive API documentation via Swagger UI:
+
+- [http://localhost:8082/swagger/index.html](http://localhost:8082/swagger/index.html)
+
+---
+
+### 📚 Endpoints
+
+#### ✅ Create a Task
+
+- **URL**: `/api/tasks`
+- **Method**: `POST`
+- **Request Body**:
+```json
+{
+  "title": "Buy groceries",
+  "status": "pending"
+}
+
+{
+  "id": 1,
+  "title": "Buy groceries",
+  "status": "pending"
+}
+
+curl -X POST http://localhost:8082/api/tasks \
+-H "Content-Type: application/json" \
+-d '{"title":"Buy groceries", "status":"pending"}'
+
+[
+  {
+    "id": 1,
+    "title": "Buy groceries",
+    "status": "pending"
+  }
+]
+
+{
+  "title": "Buy vegetables",
+  "status": "completed"
+}
+
+{
+  "message": "Task deleted successfully"
+}
