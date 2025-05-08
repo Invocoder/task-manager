@@ -7,6 +7,7 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/invocoder/task-manager/internal/storage"
@@ -51,17 +52,53 @@ func New(storage storage.Storage) http.HandlerFunc {
 	}
 }
 
-func GetByid(storage storage.Storage) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		status := r.PathValue("status")
-		slog.Info("getting a task", slog.String("status", status))
+// func GetByid(storage storage.Storage) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		status := r.PathValue("status")
+// 		slog.Info("getting a task", slog.String("status", status))
 
-		task, err := storage.GetTaskByStatus(status)
+// 		task, err := storage.GetTaskByStatus(status)
+// 		if err != nil {
+// 			slog.Error("error geting task")
+// 			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
+// 			return
+// 		}
+// 		response.WriteJson(w, http.StatusOK, task)
+// 	}
+// }
+
+func GetByStatusPaginated(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		status := r.URL.Query().Get("status")
+		limitStr := r.URL.Query().Get("limit")
+		offsetStr := r.URL.Query().Get("offset")
+
+		limit, _ := strconv.Atoi(limitStr)
+		offset, _ := strconv.Atoi(offsetStr)
+
+		tasks, err := storage.GetTasksByStatus(status, limit, offset)
 		if err != nil {
-			slog.Error("error geting task")
 			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
 			return
 		}
-		response.WriteJson(w, http.StatusOK, task)
+
+		response.WriteJson(w, http.StatusOK, tasks)
+	}
+}
+
+func Update(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var task types.Task
+		if err := json.NewDecoder(r.Body).Decode(&task); err != nil {
+			response.WriteJson(w, http.StatusBadRequest, response.GeneralError(err))
+			return
+		}
+
+		if err := storage.UpdateTask(task.ID, task.Title, task.Status); err != nil {
+			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
+			return
+		}
+
+		response.WriteJson(w, http.StatusOK, response.Response{Status: response.StatusOK})
 	}
 }

@@ -2,7 +2,6 @@ package sqlite
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/invocoder/task-manager/internal/config"
 	"github.com/invocoder/task-manager/internal/types"
@@ -53,22 +52,26 @@ func (s *Sqlite) CreateTask(title string, status string) (int64, error) {
 	return lastId, nil
 }
 
-func (s *Sqlite) GetTaskByStatus(status string) (types.Task, error) {
-	stmt, err := s.Db.Prepare("SELECT * FROM tasks where status = ? LIMIT 1")
+func (s *Sqlite) GetTasksByStatus(status string, limit, offset int) ([]types.Task, error) {
+	rows, err := s.Db.Query("SELECT id, title, status FROM tasks WHERE status = ? LIMIT ? OFFSET ?", status, limit, offset)
 	if err != nil {
-		return types.Task{}, err
+		return nil, err
 	}
+	defer rows.Close()
 
-	defer stmt.Close()
-
-	var task types.Task
-
-	err = stmt.QueryRow(status).Scan(&task.ID, &task.Title, &task.Status)
-	if err != nil {
-		if err == sql.ErrNoRows {
-			return types.Task{}, fmt.Errorf("no task found with %q status", status)
+	var tasks []types.Task
+	for rows.Next() {
+		var task types.Task
+		err := rows.Scan(&task.ID, &task.Title, &task.Status)
+		if err != nil {
+			return nil, err
 		}
-		return types.Task{}, fmt.Errorf("query error: %w", err)
+		tasks = append(tasks, task)
 	}
-	return task, nil
+	return tasks, nil
+}
+
+func (s *Sqlite) UpdateTask(id int64, title string, status string) error {
+	_, err := s.Db.Exec("UPDATE tasks SET title = ?, status = ? WHERE id = ?", title, status, id)
+	return err
 }

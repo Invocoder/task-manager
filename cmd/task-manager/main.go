@@ -31,8 +31,9 @@ func main() {
 	router := http.NewServeMux()
 
 	router.HandleFunc("POST /api/tasks", task.New(storage))
-	router.HandleFunc("GET /api/tasks/{status}", task.GetByid(storage))
-	
+	router.HandleFunc("GET /api/tasks", task.GetByStatusPaginated(storage))
+	router.HandleFunc("PUT /api/tasks/{id}", task.Update(storage))
+
 	//setup server
 	server := http.Server{
 		Addr:    cfg.Addr,
