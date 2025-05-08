@@ -2,8 +2,10 @@ package sqlite
 
 import (
 	"database/sql"
+	"fmt"
 
 	"github.com/invocoder/task-manager/internal/config"
+	"github.com/invocoder/task-manager/internal/types"
 	_ "github.com/mattn/go-sqlite3"
 )
 
@@ -49,4 +51,24 @@ func (s *Sqlite) CreateTask(title string, status string) (int64, error) {
 		return 0, err
 	}
 	return lastId, nil
+}
+
+func (s *Sqlite) GetTaskByStatus(status string) (types.Task, error) {
+	stmt, err := s.Db.Prepare("SELECT * FROM tasks where status = ? LIMIT 1")
+	if err != nil {
+		return types.Task{}, err
+	}
+
+	defer stmt.Close()
+
+	var task types.Task
+
+	err = stmt.QueryRow(status).Scan(&task.ID, &task.Title, &task.Status)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return types.Task{}, fmt.Errorf("no task found with %q status", status)
+		}
+		return types.Task{}, fmt.Errorf("query error: %w", err)
+	}
+	return task, nil
 }

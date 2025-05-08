@@ -32,6 +32,7 @@ func main() {
 
 	router.HandleFunc("POST /api/tasks", task.New(storage))
 	router.HandleFunc("GET /api/tasks/{status}", task.GetByid(storage))
+	
 	//setup server
 	server := http.Server{
 		Addr:    cfg.Addr,

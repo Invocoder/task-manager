@@ -50,3 +50,18 @@ func New(storage storage.Storage) http.HandlerFunc {
 		response.WriteJson(w, http.StatusCreated, map[string]int64{"id": lastId})
 	}
 }
+
+func GetByid(storage storage.Storage) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		status := r.PathValue("status")
+		slog.Info("getting a task", slog.String("status", status))
+
+		task, err := storage.GetTaskByStatus(status)
+		if err != nil {
+			slog.Error("error geting task")
+			response.WriteJson(w, http.StatusInternalServerError, response.GeneralError(err))
+			return
+		}
+		response.WriteJson(w, http.StatusOK, task)
+	}
+}
