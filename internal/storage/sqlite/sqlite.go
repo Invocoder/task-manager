@@ -75,3 +75,8 @@ func (s *Sqlite) UpdateTask(id int64, title string, status string) error {
 	_, err := s.Db.Exec("UPDATE tasks SET title = ?, status = ? WHERE id = ?", title, status, id)
 	return err
 }
+
+func (s *Sqlite) DeleteTask(id int64) error {
+	_, err := s.Db.Exec("DELETE FROM tasks WHERE id = ?", id)
+	return err
+}
