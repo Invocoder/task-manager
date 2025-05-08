@@ -12,9 +12,6 @@ This service is a simple **Task Manager API** designed to manage tasks with basi
 
 ### 💡 Design Decisions:
 - **Go (Golang)** is used for high performance and simplicity in building REST APIs.
-- **Chi router** provides a lightweight and idiomatic way to define HTTP routes.
-- **Modular package structure**: Each responsibility (task handling, storage, routing) is isolated.
-- **In-memory storage** for simplicity and testability (easily replaceable with a real database).
 - **Status-based filtering** and **pagination** included to simulate real-world requirements.
 
 ---
