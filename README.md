@@ -2,7 +2,7 @@
 
 ## 📌 Overview
 
-This service is a simple **Task Manager API** designed to manage tasks. This is a modular, scalable service that adheres to microservices architecture principles.
+This service is a **Task Manager** designed to manage tasks. This is a modular, scalable service that adheres to microservices architecture principles.
 
 ### ✅ Features:
 - Create a new task
