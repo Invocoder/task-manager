@@ -8,9 +8,10 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type HttpServer struct {
-	Addr string
-}
+	type HttpServer struct {
+		Addr string `yaml:"address" env-required:true`
+	}
+	
 type Config struct {
 	Env         string `yaml:"env" env:"ENV" env-required:"true"`
 	StoragePath string `yaml:"storage_path" env-required:"true"`
