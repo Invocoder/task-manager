@@ -1,5 +1,4 @@
 package types
-import "time"
 
 // type Task struct {
 //     ID        int       `json:"id"`
@@ -9,8 +8,8 @@ import "time"
 // }
 
 type Task struct {
-    ID        int       
+    ID        int64     
     Title     string `validate:"required"` 
     Status    string  `validate:"required"` 
-    CreatedAt time.Time `validate:"required"` 
+    //CreatedAt time.Time `validate:"required"` 
 }

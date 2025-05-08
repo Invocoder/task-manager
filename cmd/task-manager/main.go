@@ -13,6 +13,7 @@ import (
 
 	"github.com/invocoder/task-manager/internal/config"
 	"github.com/invocoder/task-manager/internal/config/http/handlers/task"
+	"github.com/invocoder/task-manager/internal/storage/sqlite"
 )
 
 func main() {
@@ -20,10 +21,16 @@ func main() {
 	cfg := config.MustLoad()
 
 	//dataabse setup
+	storage, err := sqlite.New(cfg)
+	if err != nil {
+		log.Fatal(err)
+	}
+	slog.Info("Storage Initialized", slog.String("env", cfg.Env), slog.String("version", "1.0.0"))
+
 	//setup router
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /api/tasks", task.New())
+	router.HandleFunc("POST /api/tasks", task.New(storage))
 
 	//setup server
 	server := http.Server{

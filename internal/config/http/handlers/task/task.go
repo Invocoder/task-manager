@@ -9,11 +9,12 @@ import (
 	"net/http"
 
 	"github.com/go-playground/validator/v10"
+	"github.com/invocoder/task-manager/internal/storage"
 	"github.com/invocoder/task-manager/internal/types"
 	"github.com/invocoder/task-manager/internal/utils/response"
 )
 
-func New() http.HandlerFunc {
+func New(storage storage.Storage) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		slog.Info(("Creating a task"))
 		var task types.Task
@@ -35,6 +36,17 @@ func New() http.HandlerFunc {
 			response.WriteJson(w, http.StatusBadRequest, response.ValidationError(validateErrs))
 			return
 		}
-		response.WriteJson(w, http.StatusCreated, map[string]string{"success": "OK"})
+		lastId, err := storage.CreateTask(
+			task.Title,
+			task.Status,
+		)
+
+		slog.Info("Task created successfully", slog.String("taskId", fmt.Sprint(lastId)))
+		if err != nil {
+			response.WriteJson(w, http.StatusInternalServerError, map[string]string{"success": "OK"})
+			return
+		}
+
+		response.WriteJson(w, http.StatusCreated, map[string]int64{"id": lastId})
 	}
 }
